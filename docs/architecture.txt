@@ -1,0 +1,42 @@
+@SimpleDto(configs = ["configName1","configName2"])
+	- ovozmozvit pojke dtos za edna klasa, so definiranje na ime na configot
+@FieldMapping(config="config_name",name="novo_ime_za_field",child_config="childConfigName"flatten: boolean)
+	- name: koe ime sakas da go imat vo dtoto
+	- child_config: imeto na configuracijata na anotiranoto pole so sakas da sa iskoristit, ako anotiranoto pole e custom class.Ova pole mozit da sa izostavit ako imat tocno edna configuracija, vo sprotivno zadolzitelno
+	- flatten: dali atributite na child entitetot da sa prikazat kako atributi na parent entitetot (flattening)
+.	-config_name: isto ko child config mozit da sa izostavit ako imat tocno edna configuracija.
+
+Mozit na 2 razlicni klasi da imat @SimpleDTO anotacija so isti iminja na configuracii.
+Ova sa postigvit taka so ako imame config so name "pande" nad klasa A i nad klasa B, togas tie stanvat A_pande,B_pande taka so sekogas ke imat unikatno ime. Ova transformacija na iminjava spored class name e samo interno, ko ke sa pret procesiranjeto na anotaciite. Developerot si gi vnesvit kako so sakat, bez prefixi.
+
+
+@RequestDTO sa koristit vo funkcii, potocno na parametri vo funkcii kaj so bi primil dto objekt
+
+
+
+primer: 
+	@GetMapping()
+	fun updateUser(@RequestDTO(conifg="ime_na_config") dto: Person)
+	
+Idejata tuka e da sa injectnit soodvetniot entitet kako parametar vo funkcijata.
+dto ke stignit kako nekoj json vo funkcijava, so eden advice ke sa interceptnit PRED da sa povikat funkcijata i ke go injectnit fetchnatiot ili kreiraniot person objekt. Za da sa postignit ova morat da imat nacin da znet adviceot kako da go handlenit ova.
+Vi SimpleDTO anotacijava za sekoj config trebit da sa specificirat nacin kako da sa prevedit od DTO do Modelot.
+Primer:
+	SimpleDTO(configs{
+		@DTOConfig(name="config1",repository=com.vitosak.repository.UserRepository.class,key=id)
+		@DTOConfig(...)
+	})
+	
+Za da funkcionirat ova vo adviceot, ke sa koristat specifications, pa mozit so Criteria API da sa prat dinamicni queries taka so:
+
+public <T> Specification<T> fieldEquals(String fieldName, Object value) {
+    return (root, query, cb) -> cb.equal(root.get(fieldName), value);
+}
+
+ovaj spec ke mozit da sa kreirat dinamicno vo samiot aspect/advice pa da sa pret query spored dadeniot repository vo @DTOConfig: repo.findAll(spec)
+
+@DTOConfig isto taka trebit da imat i opcija da mu kazis dali ke fetchvit ili ke go kreirat entitetot. Po default fetch e false ako nemas definirano repository i key. Ako imas - true.
+
+
+@AddValidation() tuka validacijata za dadeno pole trebit da e ili hibernate validacija so anotacija ko    @field:NotBlank @field:Size(min = 8, max = 255) (ili obicna @NotNull). Isto taka trebit da imat moznost za custom predicates za validacija. Isto rabotat ko @FieldMapping vo odnos na pojke configs.
+
