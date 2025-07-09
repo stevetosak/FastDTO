@@ -16,7 +16,7 @@ Ova sa postigvit taka so ako imame config so name "pande" nad klasa A i nad klas
 
 primer: 
 	@GetMapping()
-	fun updateUser(@RequestDTO(conifg="ime_na_config") dto: Person)
+	fun updateUser(@RequestDTO(conifg="ime_na_config") dto: com.vitosak.Person)
 	
 Idejata tuka e da sa injectnit soodvetniot entitet kako parametar vo funkcijata.
 dto ke stignit kako nekoj json vo funkcijava, so eden advice ke sa interceptnit PRED da sa povikat funkcijata i ke go injectnit fetchnatiot ili kreiraniot person objekt. Za da sa postignit ova morat da imat nacin da znet adviceot kako da go handlenit ova.
@@ -40,3 +40,4 @@ ovaj spec ke mozit da sa kreirat dinamicno vo samiot aspect/advice pa da sa pret
 
 @AddValidation() tuka validacijata za dadeno pole trebit da e ili hibernate validacija so anotacija ko    @field:NotBlank @field:Size(min = 8, max = 255) (ili obicna @NotNull). Isto taka trebit da imat moznost za custom predicates za validacija. Isto rabotat ko @FieldMapping vo odnos na pojke configs.
 
+Ne morat da sa pisit ResponseEntity wrapper, tuku mozit i to so pointcut, so ke matchvit site funkcii na koi return type == ResponseEntity<OD ANOTIRANA KLASA>
