@@ -1,16 +1,19 @@
 package com.vitosak.annotations;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import jakarta.validation.Constraint;
 
+import java.lang.annotation.*;
 
-// ke sa koristit za site fields da mozis da gi anotiras so validacii
+/// Specifying a string="" is the same as defining it as it were not to exists at all
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
+@Repeatable(FieldMappings.class)
 public @interface FieldMapping {
-    String referencesDTO() default ""; // ova morat da e zadolzitelno ako poleto e referenced entity
-    //validator
-    //predicates
+    String referencesDTO();
+    String mappedTo() default "";
+    String useDTO() default "";
+    boolean flatten() default false;
+    //TODO: vidi dali imat nekoj nachin da gi zamenish ovie lajnava i da klajme predikati
+    Constraint[] predicates() default {};
 }
+

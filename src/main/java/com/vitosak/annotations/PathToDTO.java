@@ -6,8 +6,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.FIELD)
-// ova da sa koristit zaedno so @FieldMapping i ke gi flattenit spored pravilata na field mapping
-public @interface Flatten {
-
+@Target(ElementType.TYPE)
+public @interface PathToDTO {
+    String[] paths();
 }
