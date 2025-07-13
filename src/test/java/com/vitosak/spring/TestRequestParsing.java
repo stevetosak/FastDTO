@@ -1,32 +1,72 @@
 package com.vitosak.spring;
 
+import com.vitosak.spring.setup.Stub;
+import com.vitosak.spring.setup.TestApp;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
-import org.springframework.test.context.junit.jupiter.web.SpringJUnitWebConfig;
-import org.springframework.test.web.client.MockRestServiceServer;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.http.ResponseEntity;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-//TODO: load the aspect into spring
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@SpringJUnitWebConfig(locations= "classpath:com/vitosak/spring/setup")
+@SpringBootTest(
+        webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
+        classes = { TestApp.class }
+)
+@ExtendWith({ SpringExtension.class })
 public class TestRequestParsing {
 
-    @LocalServerPort
-    int port;
+    @Autowired
+    TestRestTemplate client;
 
-    TestRestTemplate client = new TestRestTemplate();
-
-
-    @BeforeAll
-    static void setUp() {
-
+    @Nested
+    class TestBootstraping {
+        @Test
+        void shouldReturn200OK() {
+            ResponseEntity<String> response = client.getForEntity("/test/v1/heart-beat", String.class);
+            Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
+        }
     }
 
-    @Test
-    void shouldReturnResponse(){
+    @Nested
+    class TestAspectBootstraping {
+        @Autowired
+        Stub stub;
+
+        @Test
+        void shouldThrowAspectSuccesful(){
+            Assertions.assertThrows(AspectInvokationSuccesful.class, () -> stub.something());
+        }
+    }
+
+    @Nested
+    class TestParsing{
+        @Test
+        void shouldReturnSimpleModel() {
+            Assertions.assertThrowsExactly(
+                    AspectInvokationSuccesful.class,
+                    () -> client.getForObject("/test/v1/aspect", String.class)
+            );
+        }
+
+        @Test
+        void shouldReturnEverythingEntityModel() {
+
+        }
+
+        @Test
+        void whenRequestedDBOp_thenReturnEverythingModel() {
+
+        }
+
+        @Test
+        void shouldReturnModelWithCompositeKeys() {
+
+        }
     }
 }

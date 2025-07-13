@@ -16,8 +16,13 @@ public class TestController {
     public TestController(TestRepo repo) {this.repo = repo;}
 
     @GetMapping("/heart-beat")
-    public ResponseEntity<Void> isResponsive() {
+    public ResponseEntity<Void> getResponse() {
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/aspect")
+    public ResponseEntity<String> getAspect() {
+        return ResponseEntity.ok("");
     }
 
     @GetMapping("simple-model")
