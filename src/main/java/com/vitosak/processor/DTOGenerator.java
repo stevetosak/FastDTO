@@ -17,11 +17,9 @@ import static org.reflections.scanners.Scanners.TypesAnnotated;
 
 public class DTOGenerator {
     private final ConfigRepo configStore;
-    private FieldDescriptorBuilder fieldBuilder;
 
     public DTOGenerator(ConfigRepo configStore) {
         this.configStore = configStore;
-        this.fieldBuilder = FieldDescriptorBuilder.builder();
     }
 
     private Set<Class<?>> findDeclareDTOAnnotatedClasses(String pathPackage) {
@@ -36,18 +34,19 @@ public class DTOGenerator {
     ///  Processes the FieldMappings into pendingConfig
     private void processAnnotatedField(Field field, Map<String, List<FieldDescriptor>> pendingConfig) {
         if(field.isAnnotationPresent(FieldMapping.class)) {
+
             FieldMapping annotation = field.getAnnotation(FieldMapping.class);
-            pendingConfig.get(generateFullConfigName(field.getDeclaringClass(),annotation.referencesDTO()))
+            pendingConfig.get(generateFullConfigName(field.getDeclaringClass(),annotation.configName()))
                    .add(FieldDescriptorFactory.createFieldDescriptor(field, annotation));
            return;
         }
         Set<String> visited = new HashSet<>();
         for (FieldMapping fieldMapping : field.getAnnotation(FieldMappings.class).value()) {
-            if (visited.contains(fieldMapping.referencesDTO())) {
+            if (visited.contains(fieldMapping.configName())) {
                 throw new MultipleMappings(field.getDeclaringClass());
             }
-            visited.add(fieldMapping.referencesDTO());
-            pendingConfig.get(generateFullConfigName(field.getDeclaringClass(), fieldMapping.referencesDTO())).add(
+            visited.add(fieldMapping.configName());
+            pendingConfig.get(generateFullConfigName(field.getDeclaringClass(), fieldMapping.configName())).add(
                     FieldDescriptorFactory.createFieldDescriptor(field, fieldMapping));
         }
     }
@@ -70,10 +69,10 @@ public class DTOGenerator {
     }
 
     private Map<String, List<FieldDescriptor>> processClass(Class<?> cls) throws MultipleMappings {
-        String[] dtoConfigs =  cls.getAnnotationsByType(DeclareDTOs.class)[0].dtos();
+        String[] dtoConfigs =  cls.getAnnotationsByType(DeclareDTOs.class)[0].configNames();
         Map<String, List<FieldDescriptor>> pendingConfig = dtoConfigsToMap(dtoConfigs, cls);
 
-        Arrays.stream(cls.getFields())
+        Arrays.stream(cls.getDeclaredFields())
               .filter(field -> field.isAnnotationPresent(FieldMappings.class) || field.isAnnotationPresent(FieldMapping.class))
               .forEach(field -> processAnnotatedField(field, pendingConfig));
 

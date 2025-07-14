@@ -4,6 +4,7 @@ import com.vitosak.core.ConfigRepo;
 import com.vitosak.core.FieldDescriptor;
 import com.vitosak.core.FieldDescriptorBuilder;
 import com.vitosak.exceptions.MultipleMappings;
+import models.CollectionModel;
 import models.EveryThingModel;
 import models.MultipleMappingsToSameDTO;
 import models.SimpleModel;
@@ -12,10 +13,7 @@ import org.junit.jupiter.api.*;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 import static org.mockito.Mockito.*;
@@ -26,7 +24,6 @@ public class TestDTOGenerator {
 
     static ConfigRepo configRepo;
     DTOGenerator dtoGenerator;
-    FieldDescriptorBuilder fieldBuilder = FieldDescriptorBuilder.builder();
 
     @BeforeAll
     static void setUpConfigRepo() {
@@ -40,12 +37,17 @@ public class TestDTOGenerator {
 
     private Method getProcessingClassMethod(DTOGenerator dtoGenerator) throws NoSuchMethodException {
         Method processClass = dtoGenerator.getClass()
-                                          .getDeclaredMethod("processClass", Class.class);
+                .getDeclaredMethod("processClass", Class.class);
         processClass.setAccessible(true);
         return processClass;
     }
 
+
     private boolean checkEqMapConfigs(Map<String, List<FieldDescriptor>> expected, Map<String, List<FieldDescriptor>> result) {
+        System.out.println("===== EXPECTED =====");
+        System.out.println(expected);
+        System.out.println("===== RESULT =====");
+        System.out.println(result);
         for (String key : expected.keySet()) {
             if (!expected.containsKey(key)) {
                 throw new AssertionError();
@@ -59,8 +61,8 @@ public class TestDTOGenerator {
 
             for (int i = 0; i < expectedFields.size(); i++) {
                 if (!expectedFields.get(i)
-                                   .equals(resultFields.get(i))) {
-                    throw new AssertionError();
+                        .equals(resultFields.get(i))) {
+                    throw new AssertionError(expectedFields.get(i) + " != " + resultFields.get(i));
                 }
             }
         }
@@ -78,7 +80,7 @@ public class TestDTOGenerator {
         );
 
         Assertions.assertEquals(MultipleMappings.class, targetException.getCause()
-                                                                       .getClass());
+                .getClass());
     }
 
     @Test
@@ -92,12 +94,12 @@ public class TestDTOGenerator {
                         Map.entry(
                                 DTOGenerator.generateFullConfigName(SimpleModel.class, "WEB"),
                                 List.of(
-                                        fieldBuilder.start()
-                                                    .originalName("web")
-                                                    .mappedName("web_name")
-                                                    .type(String.class)
-                                                    .predicates(new Constraint[0])
-                                                    .build()
+                                        FieldDescriptor.builder()
+                                                .originalName("web")
+                                                .mappedName("web_name")
+                                                .type(String.class)
+                                                .predicates(new Constraint[0])
+                                                .build()
                                 ))
                 )
         );
@@ -114,41 +116,40 @@ public class TestDTOGenerator {
                         Map.entry(
                                 DTOGenerator.generateFullConfigName(EveryThingModel.class, "WEB"),
                                 List.of(
-                                        fieldBuilder.start()
-                                                    .originalName("attr1")
-                                                    .type(String.class)
-                                                    .build(),
-                                        fieldBuilder.start()
-                                                    .originalName("attr7")
-                                                    .type(SimpleModel.class)
-                                                    .useDTO(
-                                                            DTOGenerator.generateFullConfigName(SimpleModel.class,
-                                                                                                "WEB")
-                                                    )
-                                                    .build(),
-                                        fieldBuilder.start()
-                                                    .originalName("attr2")
-                                                    .type(String.class)
-                                                    .mappedName("first_email")
-                                                    .build(),
-                                        fieldBuilder.start()
-                                                    .originalName("attr5")
-                                                    .type(String.class)
-                                                    .build()
+                                        FieldDescriptor.builder()
+                                                .originalName("attr1")
+                                                .type(String.class)
+                                                .build(),
+                                        FieldDescriptor.builder()
+                                                .originalName("attr7")
+                                                .type(SimpleModel.class)
+                                                .useDTO(
+                                                        DTOGenerator.generateFullConfigName(SimpleModel.class,
+                                                                "WEB")
+                                                )
+                                                .build(),
+                                        FieldDescriptor.builder().originalName("attr2")
+                                                .type(String.class)
+                                                .mappedName("first_email")
+                                                .build(),
+                                        FieldDescriptor.builder()
+                                                .originalName("attr5")
+                                                .type(String.class)
+                                                .build()
                                 )
                         ),
                         Map.entry(
                                 DTOGenerator.generateFullConfigName(EveryThingModel.class, "MOBILE"),
                                 List.of(
-                                        fieldBuilder.start()
-                                                    .originalName("attr5")
-                                                    .type(String.class)
-                                                    .build()
+                                        FieldDescriptor.builder()
+                                                .originalName("attr5")
+                                                .type(String.class)
+                                                .build()
                                         ,
-                                        fieldBuilder.start()
-                                                    .originalName("attr6")
-                                                    .type(String.class)
-                                                    .build()
+                                        FieldDescriptor.builder()
+                                                .originalName("attr6")
+                                                .type(String.class)
+                                                .build()
                                 )
                         ),
                         Map.entry(
@@ -161,6 +162,59 @@ public class TestDTOGenerator {
         Method processingClassMethod = getProcessingClassMethod(dtoGenerator);
         Map<String, List<FieldDescriptor>> result = (Map<String, List<FieldDescriptor>>)
                 processingClassMethod.invoke(dtoGenerator, EveryThingModel.class);
+        checkEqMapConfigs(expected, result);
+    }
+
+    @Test
+    public void testConfigForCollectionTypes() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        Map<String, List<FieldDescriptor>> expected = new HashMap<>(
+                Map.ofEntries(
+                        Map.entry(DTOGenerator.generateFullConfigName(CollectionModel.class, "WEB"),
+                                List.of(
+                                        FieldDescriptor.builder()
+                                                .originalName("attrs")
+                                                .isCollection(true)
+                                                .type(String.class)
+                                                .build(),
+                                        FieldDescriptor.builder()
+                                                .originalName("simpleModels")
+                                                .type(SimpleModel.class)
+                                                .isCollection(true)
+                                                .useDTO("WEB")
+                                                .build()
+                                        ,
+                                        FieldDescriptor.builder()
+                                                .originalName("id")
+                                                .type(Integer.class)
+                                                .isCollection(false)
+                                                .build()
+                                        ,
+                                        FieldDescriptor.builder()
+                                                .originalName("set")
+                                                .isCollection(true)
+                                                .type(Integer.class)
+                                                .build(),
+
+                                        FieldDescriptor.builder()
+                                                .originalName("compositeCollection")
+                                                .type(Map.class)
+                                                .isCollection(true)
+                                                .build()
+
+                                )
+                        ),
+                        Map.entry(
+                                DTOGenerator.generateFullConfigName(CollectionModel.class, "REGISTER"),
+                                new ArrayList<>()
+                        )
+
+                )
+        );
+
+        Method processingClassMethod = getProcessingClassMethod(dtoGenerator);
+        @SuppressWarnings("unchecked")
+        Map<String, List<FieldDescriptor>> result = (Map<String, List<FieldDescriptor>>)
+                processingClassMethod.invoke(dtoGenerator, CollectionModel.class);
         checkEqMapConfigs(expected, result);
     }
 }

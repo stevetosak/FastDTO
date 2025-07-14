@@ -3,9 +3,9 @@ package models;
 import com.vitosak.annotations.DeclareDTOs;
 import com.vitosak.annotations.FieldMapping;
 
-@DeclareDTOs(dtos = "WEB")
+@DeclareDTOs(configNames = "WEB")
 public class MultipleMappingsToSameDTO{
-    @FieldMapping(referencesDTO = "WEB")
-    @FieldMapping(referencesDTO = "WEB")
+    @FieldMapping(configName = "WEB")
+    @FieldMapping(configName = "WEB")
     public String attr4;
 }
