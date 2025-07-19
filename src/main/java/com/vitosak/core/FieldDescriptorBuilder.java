@@ -2,6 +2,7 @@ package com.vitosak.core;
 
 import jakarta.validation.Constraint;
 
+import java.util.Collection;
 import java.util.Map;
 
 
@@ -9,16 +10,17 @@ import java.util.Map;
 
 public class FieldDescriptorBuilder {
     private final FieldDescriptor field = new FieldDescriptor();
-    FieldDescriptorBuilder() {
 
+    FieldDescriptorBuilder() {
+        field.collectionType=null;
     }
 
     public FieldDescriptorBuilder originalName(String name) {
         this.field.originalName=name;
         return this;
     }
-    public FieldDescriptorBuilder isCollection(boolean isCollection) {
-        this.field.isCollection=isCollection;
+    public FieldDescriptorBuilder collectionType(Class<? extends Collection> collection) {
+        this.field.collectionType=collection;
         return this;
     }
 

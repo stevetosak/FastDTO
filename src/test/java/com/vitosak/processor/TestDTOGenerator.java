@@ -173,32 +173,32 @@ public class TestDTOGenerator {
                                 List.of(
                                         FieldDescriptor.builder()
                                                 .originalName("attrs")
-                                                .isCollection(true)
+                                                .collectionType(List.class)
                                                 .type(String.class)
                                                 .build(),
                                         FieldDescriptor.builder()
                                                 .originalName("simpleModels")
                                                 .type(SimpleModel.class)
-                                                .isCollection(true)
+                                                .collectionType(List.class)
                                                 .useDTO("WEB")
                                                 .build()
                                         ,
                                         FieldDescriptor.builder()
                                                 .originalName("id")
                                                 .type(Integer.class)
-                                                .isCollection(false)
+                                                .collectionType(null)
                                                 .build()
                                         ,
                                         FieldDescriptor.builder()
                                                 .originalName("set")
-                                                .isCollection(true)
+                                                .collectionType(Set.class)
                                                 .type(Integer.class)
                                                 .build(),
 
                                         FieldDescriptor.builder()
                                                 .originalName("compositeCollection")
                                                 .type(Map.class)
-                                                .isCollection(true)
+                                                .collectionType(List.class)
                                                 .build()
 
                                 )

@@ -52,13 +52,14 @@ public class FieldDescriptorFactory {
     public static FieldDescriptor createFieldDescriptor(Field field, FieldMapping fieldMapping) {
         boolean isCollection = Collection.class.isAssignableFrom(field.getType());
         Class<?> type = isCollection ? extractTypeFromGeneric(field) : field.getType();
+        Class<? extends Collection> collectionType = isCollection ? (Class<? extends Collection>) field.getType() : null;
         return FieldDescriptor
                 .builder()
                 .originalName(field.getName())
                 .mappedName(fieldMapping.mapTo())
                 .useDTO(useDTOString(field, fieldMapping))
                 .flatten(fieldMapping.flatten())
-                .isCollection(isCollection)
+                .collectionType(collectionType)
                 .type(type)
                 .predicates(fieldMapping.predicates())
                 .build();

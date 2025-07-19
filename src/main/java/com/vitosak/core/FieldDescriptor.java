@@ -3,6 +3,7 @@ package com.vitosak.core;
 import jakarta.validation.Constraint;
 
 import java.util.Arrays;
+import java.util.Collection;
 
 public class FieldDescriptor {
     public String originalName;
@@ -10,7 +11,7 @@ public class FieldDescriptor {
     public String useDTO = "";
     public boolean flatten = false ;
     public Class type; // ako e collection: Collection<T> togas type = T
-    public boolean isCollection = false;
+    public Class<? extends Collection> collectionType = null;
     public Constraint[] predicates = new Constraint[0];
 
    public FieldDescriptor(){
@@ -25,7 +26,7 @@ public class FieldDescriptor {
                 ", useDTO='" + useDTO + '\'' +
                 ", flatten=" + flatten +
                 ", type=" + type +
-                ", isCollection=" + isCollection +
+                ", isCollection=" + collectionType +
                 ", predicates=" + Arrays.toString(predicates) +
                 '}';
     }
