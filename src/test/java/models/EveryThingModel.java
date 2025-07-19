@@ -3,23 +3,23 @@ package models;
 import com.vitosak.annotations.DeclareDTOs;
 import com.vitosak.annotations.FieldMapping;
 
-@DeclareDTOs(dtos = { "WEB", "MOBILE", "DESKTOP" })
+@DeclareDTOs(configNames = { "WEB", "MOBILE", "DESKTOP" })
 public class EveryThingModel{
 
-    @FieldMapping(referencesDTO = "WEB")
+    @FieldMapping(configName = "WEB")
     public String attr1;
 
-    @FieldMapping(referencesDTO = "WEB",useDTO = "WEB")
+    @FieldMapping(configName = "WEB", referencedConfigName = "WEB")
     public SimpleModel attr7;
 
-    @FieldMapping(referencesDTO = "WEB",mappedTo = "first_email")
+    @FieldMapping(configName = "WEB", mapTo = "first_email")
     public String attr2;
 
-    @FieldMapping(referencesDTO = "WEB")
-    @FieldMapping(referencesDTO = "MOBILE")
+    @FieldMapping(configName = "WEB")
+    @FieldMapping(configName = "MOBILE")
     public String attr5;
 
 
-    @FieldMapping(referencesDTO = "MOBILE")
+    @FieldMapping(configName = "MOBILE")
     public String attr6;
 }

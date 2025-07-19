@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 public class ConfigRepo{
-    private Map<String, List<FieldDescriptor>> parsingConfigs = new HashMap<>();
+    private final Map<String, List<FieldDescriptor>> parsingConfigs = new HashMap<>();
 
     public ConfigRepo() {
     }
