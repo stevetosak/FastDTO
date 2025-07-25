@@ -41,11 +41,12 @@ public class DTOGenerator {
            return;
         }
         Set<String> visited = new HashSet<>();
-        String fullConfigName=generateFullConfigName(field.getDeclaringClass(),field.getName());
+
         for (FieldMapping fieldMapping : field.getAnnotation(FieldMappings.class).value()) {
             if (visited.contains(fieldMapping.configName())) {
                 throw new MultipleMappings(field.getDeclaringClass());
             }
+            String fullConfigName=generateFullConfigName(field.getDeclaringClass(),fieldMapping.configName());
             visited.add(fieldMapping.configName());
             pendingConfig.get(fullConfigName).add(FieldDescriptorFactory.createFieldDescriptor(field, fieldMapping));
         }
