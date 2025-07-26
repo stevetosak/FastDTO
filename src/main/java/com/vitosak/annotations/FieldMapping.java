@@ -9,9 +9,9 @@ import java.lang.annotation.*;
 @Target(ElementType.FIELD)
 @Repeatable(FieldMappings.class)
 public @interface FieldMapping {
-    String referencesDTO();
-    String mappedTo() default "";
-    String useDTO() default "";
+    String configName(); // koe ime na config da go korisit
+    String mapTo() default ""; // imeto na field vo generiraniot dto
+    String referencedConfigName() default ""; // ako e user defined klasa anotiraniot field, imeto na referenciraniot config name so ke se koristit pri serijalizacija.
     boolean flatten() default false;
     //TODO: vidi dali imat nekoj nachin da gi zamenish ovie lajnava i da klajme predikati
     Constraint[] predicates() default {};
